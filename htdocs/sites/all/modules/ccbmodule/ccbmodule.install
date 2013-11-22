@@ -1,0 +1,18 @@
+<?php
+/* 
+ * All kinds of db related deffination/changes should be placed here
+*/
+
+function ccbmodule_install() {
+    switch ($GLOBALS['db_type']) {
+        case 'mysql':
+        case 'mysqli':			
+    }
+}
+
+
+function ccbmodule_uninstall() {
+}
+
+ 
+?>
