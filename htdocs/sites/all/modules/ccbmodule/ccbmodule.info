@@ -1,7 +1,0 @@
-name = codemate cricket board
-description = codemate cricket board site's functionalities and customization
-package = ccb content
-version = VERSION
-core = 6.x
-
-
