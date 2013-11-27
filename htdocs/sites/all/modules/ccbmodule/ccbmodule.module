@@ -557,18 +557,16 @@ function _ccbmodule_palyer_after_build(&$form, &$form_state) {
 }
 
 function _ccbmodule_statistics($arg0) {
-    print $arg0;
+
+
+    $objModel = new CCB_Model();
     $seasonId = "";
-
-
     if(empty($arg0)){
-        $seasonId = 810;
+        $seasonId = $objModel->getLatestTournament();
     } else {
         $seasonId = $arg0;
     }
 
-
-    $objModel = new CCB_Model();
     //$bowlling_statistics_first_class = $objModel->allPlayerBowlingRecord(FIRST_CLASS_MATCH);
     //$bating_statistics_first_class = $objModel->allPlayerBattingRecord(FIRST_CLASS_MATCH);
     //$bowlling_statistics_odi = $objModel->allPlayerBowlingRecord(ODI);
