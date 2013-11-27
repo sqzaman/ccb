@@ -62,10 +62,12 @@ class theme_top_batsman extends theme_block_strategy {
 
     function theme_publish_block() {
         $objModel = new CCB_Model();
-        $top_batsman = $objModel->allPlayerBattingRecord(T20);
-        //$top_batsman = null;
-        //print_r($top_batsman);
-        return theme('top_batsman', NULL, $top_batsman);
+        $seasonId = $objModel->getLatestTournament();
+        $top_batsman = $objModel->allPlayerBattingRecord(T20, $seasonId);
+        $top_batsman = null;
+        $info = new stdClass();
+        $info->seasonId = $seasonId;
+        return theme('top_batsman', NULL, $top_batsman, $info);
     }
 
 }
@@ -74,9 +76,12 @@ class theme_top_bowler extends theme_block_strategy {
 
     function theme_publish_block() {
         $objModel = new CCB_Model();
-        $top_bowler = $objModel->allPlayerBowlingRecord(T20);
-        //$top_bowler = null;
-        return theme('top_bowler', NULL, $top_bowler);
+        $seasonId = $objModel->getLatestTournament();
+        $top_bowler = $objModel->allPlayerBowlingRecord(T20, $seasonId);
+        $top_bowler = null;
+        $info = new stdClass();
+        $info->seasonId = $seasonId;
+        return theme('top_bowler', NULL, $top_bowler, $info);
     }
 
 }

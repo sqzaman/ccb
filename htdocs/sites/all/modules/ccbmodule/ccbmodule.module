@@ -124,11 +124,11 @@ function ccbmodule_theme() {
         ),
         'top_batsman' => array(
             'template' => 'top_batsman',
-            'arguments' => array('date' => NULL, 'data' => array())
+            'arguments' => array('date' => NULL, 'data' => array(), 'info' => new stdClass())
         ),
         'top_bowler' => array(
             'template' => 'top_bowler',
-            'arguments' => array('date' => NULL, 'data' => array())
+            'arguments' => array('date' => NULL, 'data' => array(), 'info' => new stdClass())
         ),
         'recent_photo_gallery' => array(
             'template' => 'recent_photo_gallery',
@@ -556,15 +556,26 @@ function _ccbmodule_palyer_after_build(&$form, &$form_state) {
     return $form;
 }
 
-function _ccbmodule_statistics() {
+function _ccbmodule_statistics($arg0) {
+    print $arg0;
+    $seasonId = "";
+
+
+    if(empty($arg0)){
+        $seasonId = 810;
+    } else {
+        $seasonId = $arg0;
+    }
+
+
     $objModel = new CCB_Model();
     //$bowlling_statistics_first_class = $objModel->allPlayerBowlingRecord(FIRST_CLASS_MATCH);
     //$bating_statistics_first_class = $objModel->allPlayerBattingRecord(FIRST_CLASS_MATCH);
     //$bowlling_statistics_odi = $objModel->allPlayerBowlingRecord(ODI);
     //$bating_statistics_odi = $objModel->allPlayerBowlingRecord(ODI);
 
-    $bowlling_statistics_t20 = $objModel->allPlayerBowlingRecord(T20);
-    $bating_statistics_t20 = $objModel->allPlayerBattingRecord(T20);
+    $bowlling_statistics_t20 = $objModel->allPlayerBowlingRecord(T20, $seasonId);
+    $bating_statistics_t20 = $objModel->allPlayerBattingRecord(T20, $seasonId);
 
     $data = new stdClass();
 
@@ -575,6 +586,7 @@ function _ccbmodule_statistics() {
 
     $data->bating_statistics_t20 = $bating_statistics_t20;
     $data->bowlling_statistics_t20 = $bowlling_statistics_t20;
+    $data->seasons = $objModel->getTournamentSession();
     return theme('ccb_statistics', NULL, $data);
 }
 

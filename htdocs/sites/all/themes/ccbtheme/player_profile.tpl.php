@@ -1,4 +1,5 @@
 <h2><?php echo $data->player_info->title;?></h2>
+<iframe src="//www.facebook.com/plugins/like.php?href=https%3A%2F%2Fdevelopers.facebook.com%2Fdocs%2Fplugins%2F&amp;width&amp;layout=button_count&amp;action=like&amp;show_faces=true&amp;share=true&amp;height=21&amp;appId=59674903355" scrolling="no" frameborder="0" style="border:none; overflow:hidden; height:21px;" allowTransparency="true"></iframe>
 <dl class="player_info">
     <dt><a href="#"><?php print theme('imagecache', "player_profile", $data->player_info->field_players_photo[0]['filepath']);?></a></dt>
     <dd class="details">

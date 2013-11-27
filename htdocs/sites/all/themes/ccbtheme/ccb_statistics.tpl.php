@@ -51,11 +51,23 @@
                 "iDisplayLength": 50,
 		"sPaginationType": "full_numbers"
 	} );
+
+
     });
 </script>
 
 <div id="batting-tabs">
-    <h3 class="h3_01">Batting Statistics</h3>
+    <div style="float: right; line-height: 40px; margin-right: 20px;">
+        <label>Season: </label>
+        <select id="season" style="border-radius: 0;" onChange='window.location="<?php global $base_url; echo $base_url ?>/ccb/statistics/" + this.value;'>
+            <option value="all" <?php if (arg(2) == "all"): ?> selected="selected" <?php endif; ?>>All</option>
+            <?php while( $season = db_fetch_object($data->seasons)): ?>
+                <option value="<?php echo $season->nid; ?>" <?php if (arg(2) == $season->nid): ?> selected="selected" <?php endif; ?>><?php echo $season->title; ?></option>
+            <?php endwhile; ?>
+        </select>
+    </div>
+
+    <h3 class="h3_01" style=" height: 40px;ine-height: 40px;">Batting Statistics</h3>
     <ul>
         <li><a href="#tabs-1">T20</a></li>
     </ul>

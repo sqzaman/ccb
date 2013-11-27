@@ -83,7 +83,7 @@ class CCB_Model extends Base_Model {
 
     # get all player bowling statistics
 
-    public function allPlayerBattingRecord($match_type) {
+    public function allPlayerBattingRecord($match_type, $seasonId = "all") {
         $statistics = array();
         $sql = sprintf("SELECT n.nid, title, sn.field_short_name_value, p.field_players_nick_value 
             FROM node n 
@@ -95,7 +95,7 @@ class CCB_Model extends Base_Model {
         $result = $this->executeQuery($sql);
 
         while ($row = db_fetch_object($result)) {
-            $array = $this->singlePlayerBattingRecord($row->nid, $match_type);
+            $array = $this->singlePlayerBattingRecord($row->nid, $match_type, $seasonId);
             if (isset($array)) {
                 $array['nid'] = $row->nid;
                 $array['name'] = $row->title;
@@ -115,7 +115,7 @@ class CCB_Model extends Base_Model {
 
     # get all player bowling statistics
 
-    public function allPlayerBowlingRecord($match_type) {
+    public function allPlayerBowlingRecord($match_type, $seasonId = "all") {
         $statistics = array();
         $sql = sprintf("SELECT n.nid, title, sn.field_short_name_value 
             FROM node n LEFT JOIN content_type_ccb_players p ON(p.nid=n.nid)
@@ -125,7 +125,7 @@ class CCB_Model extends Base_Model {
         $result = $this->executeQuery($sql);
 
         while ($row = db_fetch_object($result)) {
-            $array = $this->singlePlayerBowlingRecord($row->nid, $match_type);
+            $array = $this->singlePlayerBowlingRecord($row->nid, $match_type, $seasonId);
             if (isset($array)) {
                 $array['nid'] = $row->nid;
                 $array['name'] = $row->title;
@@ -143,15 +143,22 @@ class CCB_Model extends Base_Model {
         return $statistics;
     }
 
-    public function singlePlayerBowlingRecord($nid, $match_type) {
+    public function singlePlayerBowlingRecord($nid, $match_type, $seasonId = "all") {
 
         $field = '';
+        $season_sql = '';
         for ($i = 1; $i <= 11; $i++) {
             $field .= sprintf(" field_bowling_player%d_nid" . " = '%s' OR ", $i, $nid);
         }
         $field = substr($field, 0, strlen($field) - 3);
 
-        $sql = sprintf("SELECT * FROM `content_type_ccb_bowling_card` bowls LEFT JOIN `content_type_ccb_match` cm ON(bowls.field_bowling_match_nid = cm.nid) WHERE cm.field_match_type_value = '%s' AND ($field)", $match_type);
+        if($seasonId != "all"){
+            $season_sql = "AND cm.field_season_nid=$seasonId";
+        }
+
+        $sql = sprintf("SELECT * FROM `content_type_ccb_bowling_card` bowls
+        LEFT JOIN `content_type_ccb_match` cm ON(bowls.field_bowling_match_nid = cm.nid)
+        WHERE cm.field_match_type_value = '%s' $season_sql AND ($field)", $match_type);
 
         $bc = $this->executeQuery($sql);
 
@@ -227,8 +234,8 @@ class CCB_Model extends Base_Model {
         );
     }
 
-    public function singlePlayerBattingRecord($nid, $match_type = FIRST_CLASS_MATCH) {
-        // $stat = FALSE;
+    public function singlePlayerBattingRecord($nid, $match_type = FIRST_CLASS_MATCH, $seasonId = "all") {
+        $season_sql = "";
         $current_score = 0;
         $field = '';
         for ($i = 1; $i <= 11; $i++) {
@@ -236,12 +243,19 @@ class CCB_Model extends Base_Model {
         }
         $field = substr($field, 0, strlen($field) - 3);
 
-        $sql = sprintf("SELECT * FROM `content_type_bating_score` bats LEFT JOIN `content_type_ccb_match` cm ON(bats.field_bating_match_nid = cm.nid) WHERE cm.field_match_type_value = '%s' AND($field) ORDER BY cm.`field_match_date_value`", $match_type);
+        if($seasonId != "all"){
+            $season_sql = "AND cm.field_season_nid=$seasonId";
+        }
+
+
+        $sql = sprintf("SELECT * FROM `content_type_bating_score` bats
+        LEFT JOIN `content_type_ccb_match` cm ON(bats.field_bating_match_nid = cm.nid)
+        WHERE cm.field_match_type_value = '%s' $season_sql AND($field) ORDER BY cm.`field_match_date_value`", $match_type);
 //echo $sql."<br />";exit;
         $bc = $this->executeQuery($sql);
 
         $player_id = $nid;
-        $matches = $this->getTotalNumberMatchPlayed($nid, $match_type);
+        $matches = $this->getTotalNumberMatchPlayed($nid, $match_type, $seasonId);
         $innings = 0;
         $not_out = 0;
         $runs = 0;
@@ -354,10 +368,16 @@ class CCB_Model extends Base_Model {
         );
     }
 
-    private function getTotalNumberMatchPlayed($nid, $match_type) {
+    private function getTotalNumberMatchPlayed($nid, $match_type, $seasonId = "all") {
+
+        $season_sql= "";
+        if($seasonId != "all"){
+            $season_sql = "AND cm.field_season_nid=$seasonId";
+        }
+
         $sql = sprintf("SELECT count(cm.nid) FROM content_type_ccb_match cm INNER JOIN content_type_ccb_teams ct
             ON(cm.field_match_team1_nid = ct.nid OR cm.field_match_team2_nid = ct.nid) INNER JOIN content_type_ccb_players players
-            ON(ct.nid = players.field_players_club_nid) WHERE players.nid=%d AND cm.field_match_status_value='%s' AND cm.field_match_type_value = '%s'", $nid, 'Complete', $match_type);
+            ON(ct.nid = players.field_players_club_nid) WHERE players.nid=%d AND cm.field_match_status_value='%s' AND cm.field_match_type_value = '%s' $season_sql", $nid, 'Complete', $match_type);
         // echo $sql;
         return db_result($this->executeQuery($sql));
     }
@@ -487,6 +507,18 @@ class CCB_Model extends Base_Model {
             $match['bowlling'] = $bowlling;
         }
         return $recent_matches;
+    }
+
+    function getTournamentSession(){
+        $sql = sprintf("SELECT * FROM node WHERE `type`='ccb_season' and status= 1");
+
+        return $this->executeQuery($sql);
+    }
+
+    function getLatestTournament(){
+        $sql = sprintf("SELECT nid FROM node WHERE `type`='ccb_season' and status= 1 ORDER BY nid DESC LIMIT 1");
+
+        return db_result($this->executeQuery($sql));
     }
 
     private function executeQuery($sql) {

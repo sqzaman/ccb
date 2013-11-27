@@ -17,5 +17,5 @@
      <tr><td colspan=4>No records available</td></tr>
     <?php endif; ?>
 </table>
-<span class="more_link"><a href="<?php echo base_path(). 'ccb/statistics'?>">more</a></span>
+<span class="more_link"><a href="<?php echo base_path(). 'ccb/statistics/'. $info->seasonId; ?>">more</a></span>
 
