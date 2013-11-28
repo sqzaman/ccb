@@ -127,7 +127,7 @@
                     <?php if ($logo): ?>
                     <a href="<?php print $front_page; ?>" title="" rel="home" id="logo"><img src="<?php print $logo; ?>" alt="" /></a>
                     <p>
-                        <h1>2nd Inter Software Company Cricket Tournament 2012 </h1>
+                        <h1>3rd Inter Software Company Cricket Tournament 2013 </h1>
                     </p>
                     <?php endif; ?>
                 </h1>
